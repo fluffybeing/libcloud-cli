@@ -13,7 +13,7 @@ def main():
         # TODO: There is a better way to log this message than print.
         print "Reading secrets from %r" % secret_path
 
-    parser = configparser.ConfigParser()
+        parser = configparser.ConfigParser()
         parser.read(config_path)
         get_config = dict(parser.items("default"))
     except Exception as e:
