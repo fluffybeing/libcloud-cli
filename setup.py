@@ -41,7 +41,7 @@ setup(
     scripts=[],
 
     provides=[],
-    install_requires=['cliff', 'libcloud_rest'],
+    install_requires=['cliff', 'libcloud_rest', 'configparser'],
 
     namespace_packages=[],
     packages=find_packages(),
