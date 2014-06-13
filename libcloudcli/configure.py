@@ -11,11 +11,11 @@ def main():
         # currently config.ini is in example folder
         config_path = os.path.join(root, 'examples/config.ini')
         # TODO: There is a better way to log this message than print.
-        print "Reading secrets from %r" % secret_path
+        print "Reading secrets from %r" % config_path
 
         parser = configparser.ConfigParser()
         parser.read(config_path)
-        get_config = dict(parser.items("default"))
+        config_data = dict(parser.items("default"))
     except Exception as e:
         # TODO: There is a better way to log this message than print.
         print 'Failed to load config.ini.  Reason: %r' % str(e)
