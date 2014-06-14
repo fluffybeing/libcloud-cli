@@ -5,7 +5,7 @@ import logging
 import configparser
 
 
-def main():
+def readConfigure():
     try:
         root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         # currently config.ini is in example folder
@@ -19,6 +19,3 @@ def main():
     except Exception as e:
         # TODO: There is a better way to log this message than print.
         print 'Failed to load config.ini.  Reason: %r' % str(e)
-
-if __name__ == '__main__':
-    main()
