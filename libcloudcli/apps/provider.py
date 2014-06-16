@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+# taken from libcloud.REST
+
 import inspect
 import re
 
@@ -21,18 +23,23 @@ class DriverMethod(object):
             self.driver_cls = driver_obj
         else:
             self.driver_cls = driver_obj.__class__
+
         self.driver_obj = driver_obj
         self.method_name = method_name
         self.method = getattr(self.driver_obj, method_name, None)
+
         if not inspect.ismethod(self.method):
             raise NoSuchOperationError()
         method_doc = get_method_docstring(self.driver_cls, method_name)
+
         if not method_doc:
             raise MethodParsingException('Empty docstring')
+
         argspec_arg = parse_args(self.method)
         docstring_parse_result = parse_docstring(method_doc, self.driver_cls)
         self.description = docstring_parse_result['description']
         docstring_args = docstring_parse_result['arguments']
+
         #check vargs
         self.vargs_entries = []
         for name, arg_info in argspec_arg.iteritems():
@@ -45,13 +52,15 @@ class DriverMethod(object):
                     'required': (docstring_arg['required'] or
                                  arg_info['required']),
                 }
+
                 if not entry_kwargs['required'] and 'default' in arg_info:
                     entry_kwargs['default'] = arg_info['default']
                 self.vargs_entries.append(Entry(**entry_kwargs))
             else:
                 raise MethodParsingException(
                     '%s %s not described in docstring' % (method_name, name))
-            #update kwargs
+
+        #update kwargs
         kwargs = set(docstring_args).difference(argspec_arg)
         self.kwargs_entries = [Entry(arg_name, **docstring_args[arg_name])
                                for arg_name in kwargs]
@@ -65,10 +74,13 @@ class DriverMethod(object):
 
     def get_description(self):
         result_arguments = []
+
         for entry in self.vargs_entries:
             result_arguments.extend(entry.get_arguments())
+
         for entry in self.kwargs_entries:
             result_arguments.extend(entry.get_arguments())
+
         result = {'name': self.method_name,
                   'description': self.description,
                   'arguments': result_arguments,
@@ -102,10 +114,10 @@ def get_providers_info(providers):
     """
     List of all supported providers.
 
-    @param providers: object that contain supported providers.
-    @type  providers: L{libcloud.types.Provider}
+    :param providers: object that contain supported providers.
+    :type  providers: :class:`libcloud.types.Provider`
 
-    @return C{list} of C{dict} objects
+    :return `list of dict objects`
     """
     result = []
     for provider, Driver in get_providers_dict(providers.DRIVERS,
@@ -140,15 +152,15 @@ def get_driver_by_provider_name(drivers, providers, provider_name):
     Get a driver by provider name
     If the provider is unknown, will raise an exception.
 
-    @param drivers: Dictionary containing valid providers.
+    :param drivers: Dictionary containing valid providers.
 
-    @param providers: object that contain supported providers.
-    @type providers: L{libcloud.types.Provider}
+    :param providers: object that contain supported providers.
+    :type providers: :class:`libcloud.types.Provider`
 
-    @param    provider_name:   String with a provider name (required)
-    @type     provider_name:   str
+    :param    provider_name:   String with a provider name (required)
+    :type     provider_name:   ``str``
 
-    @return: L{NodeDriver} class
+    :return: :class:`NodeDriver`
 
     """
     provider_name = provider_name.upper()
@@ -161,12 +173,7 @@ def get_driver_by_provider_name(drivers, providers, provider_name):
 
 
 def get_driver_instance(Driver, **kwargs):
-    """
 
-    @param Driver:
-    @param kwargs:
-    @return:
-    """
     try:
         json_data = json.dumps(kwargs)
         driver_method = DriverMethod(Driver, '__init__')
