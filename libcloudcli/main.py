@@ -11,9 +11,9 @@ from cliff import complete
 from cliff import help
 from commands import AWS, File, Files, Compute, CreateNode
 
-import libcloudcli
-from libcloudcli.apps import commandmanager
-
+#import libcloudcli
+#from libcloudcli.apps import commandmanager
+from apps import commandmanager
 
 class LibcloudCLI(App):
 
