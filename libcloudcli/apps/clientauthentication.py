@@ -6,6 +6,7 @@ import sys
 
 LOG = logging.getLogger(__name__)
 
+
 class ClientCache(object):
     """ Descripter class for caching created client"""
     def __init__(self, factory):
@@ -18,3 +19,4 @@ class ClientCache(object):
             self._handle = self.factory(instance)
         return self._handle
 
+# Write code for the authentication for each provider using the lincloud identity api

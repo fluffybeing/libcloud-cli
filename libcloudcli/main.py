@@ -10,7 +10,9 @@ from cliff import command
 from cliff import complete
 from cliff import help
 from commands import AWS, File, Files, Compute, CreateNode
-from cliff.commandmanager import CommandManager
+
+import libcloudcli
+from libcloudcli.apps import commandmanager
 
 
 class LibcloudCLI(App):
@@ -27,7 +29,7 @@ class LibcloudCLI(App):
         help.HelpCommand.auth_required = False
         complete.CompleteCommand.best_effort = True
 
-        ex_command = CommandManager('libcloud.cli')
+        ex_command = commandmanager.CommandManager('libcloud.cli')
         super(LibcloudCLI, self).__init__(
             description='Libcloud CLI App',
             version='0.1',
