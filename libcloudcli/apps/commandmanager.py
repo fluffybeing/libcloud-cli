@@ -1,5 +1,5 @@
 #
-#
+
 """Modify Cliff's CommandManager"""
 
 import logging

@@ -19,4 +19,4 @@ class ClientCache(object):
             self._handle = self.factory(instance)
         return self._handle
 
-# Write code for the authentication for each provider using the lincloud identity api
+# Write code for the authentication for each provider using the libcloud identity api
