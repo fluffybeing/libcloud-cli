@@ -48,17 +48,17 @@ class CreateNode(show.ShowOne):
             parsed_args.auth,
             parsed_args.location
         )
-        agent = compute_client.agents.create(*args)._info.copy()
-        return zip(*sorted(six.iteritems(agent)))
+        Node = compute_client.Node.create(*args)._info.copy()
+        return zip(*sorted(six.iteritems(Node)))
 
 
-class DeleteAgent(command.Command):
+class DeleteNode(command.Command):
     """Delete compute agent command"""
 
     log = logging.getLogger(__name__ + ".DeleteAgent")
 
     def get_parser(self, prog_name):
-        parser = super(DeleteAgent, self).get_parser(prog_name)
+        parser = super(DeleteNode, self).get_parser(prog_name)
         parser.add_argument(
             "id",
             metavar="<id>",
@@ -68,17 +68,17 @@ class DeleteAgent(command.Command):
     def take_action(self, parsed_args):
         self.log.debug("take_action(%s)" % parsed_args)
         compute_client = self.app.client_manager.compute
-        compute_client.agents.delete(parsed_args.id)
+        compute_client.Node.delete(parsed_args.id)
         return
 
 
-class SetAgent(show.ShowOne):
-    """Set compute agent command"""
+class SetNode(show.ShowOne):
+    """Set compute Node command"""
 
     log = logging.getLogger(__name__ + ".SetAgent")
 
     def get_parser(self, prog_name):
-        parser = super(SetAgent, self).get_parser(prog_name)
+        parser = super(SetNode, self).get_parser(prog_name)
         parser.add_argument(
             "id",
             metavar="<id>",
@@ -106,6 +106,5 @@ class SetAgent(show.ShowOne):
             parsed_args.url,
             parsed_args.md5hash
         )
-        agent = compute_client.agents.update(*args)._info.copy()
-        return zip(*sorted(six.iteritems(agent)))
-
+        Node = compute_client.Node.update(*args)._info.copy()
+        return zip(*sorted(six.iteritems(Node)))
