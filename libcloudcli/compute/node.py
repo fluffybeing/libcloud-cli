@@ -40,7 +40,7 @@ class CreateNode(show.ShowOne):
 
     def take_action(self, parsed_args):
         self.log.debug("take_action(%s)" % parsed_args)
-        compute_client = self.app.client_manager.compute
+        #compute_client = self.app.client_manager.compute
         args = (
             parsed_args.name,
             parsed_args.size,
@@ -48,8 +48,9 @@ class CreateNode(show.ShowOne):
             parsed_args.auth,
             parsed_args.location
         )
-        Node = compute_client.Node.create(*args)._info.copy()
-        return zip(*sorted(six.iteritems(Node)))
+        #Node = compute_client.Node.create(*args)._info.copy()
+        #return zip(*sorted(six.iteritems(Node)))
+        return "its works!"
 
 
 class DeleteNode(command.Command):

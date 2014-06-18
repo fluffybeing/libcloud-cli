@@ -9,7 +9,8 @@ from cliff.app import App
 from cliff import command
 from cliff import complete
 from cliff import help
-#from commands import AWS, File, Files, Compute, CreateNode
+
+from compute.node import CreateNode, SetNode, DeleteNode
 
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
@@ -34,12 +35,11 @@ class LibcloudCLI(App):
         help.HelpCommand.auth_required = False
         complete.CompleteCommand.best_effort = True
 
-        ex_command = commandmanager.CommandManager('libcloud.cli')
+        lib_command = commandmanager.CommandManager('libcloud.cli')
         super(LibcloudCLI, self).__init__(
             description='Libcloud CLI App',
             version='0.1',
-            command_manager=ex_command,)
-
+            command_manager=lib_command)
         # Show stack traces
         self.dump_stack_trace = True
 
@@ -72,17 +72,15 @@ class LibcloudCLI(App):
                     default=False,
                     help="Show this help message and exit",
                 )
-        '''
+
         commands = {
-            'aws': AWS,
-            'file': File,
-            'files': Files,
-            'compute': Compute,
-            'createnode': CreateNode
+            'node create': CreateNode,
+            'node set': SetNode,
+            'node destroy': DeleteNode,
         }
+
         for k, v in commands.iteritems():
-            ex_command.add_command(k, v)
-        '''
+            lib_command.add_command(k, v)
 
     def authenticate_user(self):
         """Make sure the user has provided all of the authentication
