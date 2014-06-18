@@ -51,10 +51,10 @@ setup(
         'console_scripts': [
             'libcloudcli = libcloudcli.main:main'
         ],
-        'cliff.demo': [
-            'commands = libcloudcli.commands:Commands',
-            'error = cliffdemo.simple:Error',
-            'unicode = cliffdemo.encoding:Encoding',
+        'libcloud.cli.compute': [
+            'compute_agent_create = libcloudcli.compute.node:CreateAgent',
+            'compute_agent_delete = libcloudcli.compute.node:DeleteAgent',
+            'compute_agent_set = libcloudcli.compute.node:SetAgent'
         ],
     },
 

@@ -9,11 +9,15 @@ from cliff.app import App
 from cliff import command
 from cliff import complete
 from cliff import help
-from commands import AWS, File, Files, Compute, CreateNode
+#from commands import AWS, File, Files, Compute, CreateNode
+
+from libcloud.compute.types import Provider
+from libcloud.compute.providers import get_driver
 
 #import libcloudcli
 #from libcloudcli.apps import commandmanager
 from apps import commandmanager
+from common import utils
 
 
 class LibcloudCLI(App):
@@ -68,7 +72,7 @@ class LibcloudCLI(App):
                     default=False,
                     help="Show this help message and exit",
                 )
-
+        '''
         commands = {
             'aws': AWS,
             'file': File,
@@ -78,6 +82,7 @@ class LibcloudCLI(App):
         }
         for k, v in commands.iteritems():
             ex_command.add_command(k, v)
+        '''
 
     def authenticate_user(self):
         """Make sure the user has provided all of the authentication
@@ -87,6 +92,12 @@ class LibcloudCLI(App):
         # use also the options parser for it
         # get the provider
         # authenticate with the provider with libcloud api
+        Driver = get_driver(Provider.RACKSPACE)
+        self.client_manager = Driver(
+            'ABCD', 'XYZ',
+            datacenter='us-central1-a',
+            project='your_project_id'
+            )
 
         return
 
@@ -101,6 +112,23 @@ class LibcloudCLI(App):
             else:
                 self.log.error('Exception raised: ' + str(e))
             return 1
+
+    def build_option_parser(self, description, version):
+        parser = super(LibcloudCLI, self).build_option_parser(
+            description,
+            version)
+
+        parser.add_argument(
+            '--username',
+            metavar='<username>',
+            default=utils.env('USERNAME'),
+            help='Authentication username')
+        parser.add_argument(
+            '--password',
+            metavar='<password>',
+            default=utils.env('PASSWORD'),
+            help='Authentication password')
+        return parser
 
     def initialize_app(self, argv):
         self.log.debug('initialize_app')
