@@ -67,3 +67,20 @@ class Field(object):
                 'description': self.description,
                 'type': self.type_name,
                 'required': self.required}
+
+class Entry(object):
+    _container_regex = re.compile('(.\{[_0-9a-zA-Z]+\} of .\{[_0-9a-zA-Z]+\})')
+
+    def __new__(cls, name, type_name, description='', required=True, **kwargs):
+        if not ' or ' in type_name:
+            if type_name in simple_types_fields:
+                entry_class = SimpleEntry
+            elif LibcloudObjectEntryBase.get_entry(type_name):
+                entry_class = LibcloudObjectEntryBase.get_entry(type_name)
+            elif re.match(cls._container_regex, type_name):
+                entry_class = ListEntry
+            else:
+                raise ValueError('Unknown type name %s' % (type_name))
+            return entry_class(
+                name, type_name, description, required, **kwargs)
+        return OneOfEntry(name, type_name, description, required, **kwargs)
