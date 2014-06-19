@@ -22,6 +22,7 @@ class ListModule(show.ShowOne):
             help='Show all modules that have version information',
         )
         return parser
+
 def take_action(self, parsed_args):
         self.log.debug('take_action(%s)', parsed_args)
 
