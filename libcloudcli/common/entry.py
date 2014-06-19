@@ -75,8 +75,6 @@ class Entry(object):
         if not ' or ' in type_name:
             if type_name in simple_types_fields:
                 entry_class = SimpleEntry
-            elif LibcloudObjectEntryBase.get_entry(type_name):
-                entry_class = LibcloudObjectEntryBase.get_entry(type_name)
             elif re.match(cls._container_regex, type_name):
                 entry_class = ListEntry
             else:
