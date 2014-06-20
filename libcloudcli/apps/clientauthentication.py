@@ -6,7 +6,8 @@ import sys
 
 LOG = logging.getLogger(__name__)
 
-
+# important
+# For libcloud caching is not necessary
 class ClientCache(object):
     """ Descripter class for caching created client"""
     def __init__(self, factory):
