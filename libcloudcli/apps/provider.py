@@ -89,6 +89,11 @@ class DriverMethod(object):
                 field_arg['required'] = False
         return fields_args
 
+    def get_api_resource_action(self):
+        m = self.method_name
+        result = m.split('_')
+        return result
+
     def get_description(self):
         result_arguments = []
 
@@ -99,6 +104,9 @@ class DriverMethod(object):
             result_arguments.append({entry['name']:entry['description']})
 
         #result_arguments = list(set(result_arguments))
+        tmp_result = get_api_resource_action()
+        resource = tmp_result[1]
+        action = tmp_result[0]
 
         result = {'name': self.method_name,
                   'description': self.description,
@@ -109,8 +117,8 @@ class DriverMethod(object):
                       'description': self.result_entry['description']}
                    # this will be added dynamically for each commands
                    'api': 'compute'
-                   'resource': ''
-                   'action': ''
+                   'resource': resource
+                   'action': action
                   }
         return result
 
