@@ -1,3 +1,9 @@
+### this is an example module for
+### to achieve the  <api> <resource> <construct>
+### using argparse subcommand feature
+
+
+
 import logging
 import os
 
