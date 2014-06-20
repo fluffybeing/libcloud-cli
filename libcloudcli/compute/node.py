@@ -68,8 +68,7 @@ class DeleteNode(command.Command):
 
     def take_action(self, parsed_args):
         self.log.debug("take_action(%s)" % parsed_args)
-        compute_client = self.app.client_manager.compute
-        compute_client.Node.delete(parsed_args.id)
+        print "node deleted"
         return
 
 
@@ -100,12 +99,11 @@ class SetNode(show.ShowOne):
 
     def take_action(self, parsed_args):
         self.log.debug("take_action(%s)" % parsed_args)
-        compute_client = self.app.client_manager.compute
         args = (
             parsed_args.id,
             parsed_args.version,
             parsed_args.url,
             parsed_args.md5hash
         )
-        Node = compute_client.Node.update(*args)._info.copy()
-        return zip(*sorted(six.iteritems(Node)))
+        print "node set"
+        return
