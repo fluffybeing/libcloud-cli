@@ -1,4 +1,3 @@
-"""Module action implementation"""
 
 import logging
 import six
@@ -35,7 +34,6 @@ def take_action(self, parsed_args):
                 try:
                     data[k] = mods[k].__version__
                 except AttributeError:
-                    # aw, just skip it
                     pass
 
         return zip(*sorted(six.iteritems(data)))
