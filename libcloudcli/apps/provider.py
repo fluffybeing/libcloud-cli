@@ -4,10 +4,13 @@
 import inspect
 import re
 
-from libcloud.utils.misc import get_driver
+#from libcloud.utils.misc import get_driver
+from libcloud.compute.types import Provider
+from libcloud.compute.providers import get_driver
 
-from parinx import ARGS_TO_XHEADERS_DICT, parse_args, \
+from parinx.parser import parse_args, \
     parse_docstring, get_method_docstring
+from parinx.parser import _ParinxHandler
 
 from libcloudcli.errors import ProviderNotSupportedError,\
     MissingArguments, MissingHeadersError, MethodParsingException,\
@@ -33,7 +36,7 @@ class DriverMethod(object):
         if not inspect.ismethod(self.method):
             raise NoSuchOperationError()
         method_doc = get_method_docstring(self.driver_cls, method_name)
-
+        print self.method
         if not method_doc:
             raise MethodParsingException('Empty docstring')
 
@@ -41,6 +44,9 @@ class DriverMethod(object):
         docstring_parse_result = parse_docstring(method_doc, self.driver_cls)
         self.description = docstring_parse_result['description']
         docstring_args = docstring_parse_result['arguments']
+        #print docstring_parse_result
+        #print docstring_args
+        print argspec_arg
 
         #check vargs
         self.vargs_entries = []
@@ -175,12 +181,17 @@ def get_driver_by_provider_name(drivers, providers, provider_name):
 
 
 def get_driver_instance(Driver, **kwargs):
-
+    ph = _ParinxHandler()
     try:
         json_data = json.dumps(kwargs)
         driver_method = DriverMethod(Driver, '__init__')
         return driver_method.invoke(json_data)
     except MissingArguments, error:
-        str_repr = ', '.join([ARGS_TO_XHEADERS_DICT.get(arg, arg)
+        str_repr = ', '.join([ph.ARGS_TO_XHEADERS_DICT.get(arg, arg)
                               for arg in error.arguments])
         raise MissingHeadersError(headers=str_repr)
+
+if __name__ == '__main__':
+    cls = get_driver(Provider.EC2_US_WEST)
+    #print dir(cls)
+    DriverMethod(cls, 'create_node')
