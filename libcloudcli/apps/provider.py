@@ -16,7 +16,7 @@ from libcloudcli.errors import ProviderNotSupportedError,\
     MissingArguments, MissingHeadersError, MethodParsingException,\
     NoSuchOperationError
 
-from libcloud_rest.api.entries import Entry
+from entries import Entry
 from parinx.utils import json
 
 
@@ -36,7 +36,7 @@ class DriverMethod(object):
         if not inspect.ismethod(self.method):
             raise NoSuchOperationError()
         method_doc = get_method_docstring(self.driver_cls, method_name)
-        print self.method
+
         if not method_doc:
             raise MethodParsingException('Empty docstring')
 
@@ -44,9 +44,6 @@ class DriverMethod(object):
         docstring_parse_result = parse_docstring(method_doc, self.driver_cls)
         self.description = docstring_parse_result['description']
         docstring_args = docstring_parse_result['arguments']
-        #print docstring_parse_result
-        #print docstring_args
-        print argspec_arg
 
         #check vargs
         self.vargs_entries = []
@@ -60,7 +57,6 @@ class DriverMethod(object):
                     'required': (docstring_arg['required'] or
                                  arg_info['required']),
                 }
-
                 if not entry_kwargs['required'] and 'default' in arg_info:
                     entry_kwargs['default'] = arg_info['default']
                 self.vargs_entries.append(Entry(**entry_kwargs))
@@ -70,11 +66,14 @@ class DriverMethod(object):
 
         #update kwargs
         kwargs = set(docstring_args).difference(argspec_arg)
+        print kwargs
+        '''
         self.kwargs_entries = [Entry(arg_name, **docstring_args[arg_name])
                                for arg_name in kwargs]
         method_return = docstring_parse_result['return']
         self.result_entry = Entry('', method_return['type_name'],
                                   method_return['description'], True)
+        '''
 
     @classmethod
     def _remove_type_name_brackets(cls, type_name):
@@ -118,18 +117,17 @@ class DriverMethod(object):
         return self.method(*vargs, **kwargs)
 
 
-def get_providers_info(providers):
+def get_providers_info():
     """
     List of all supported providers.
 
     :param providers: object that contain supported providers.
-    :type  providers: :class:`libcloud.types.Provider`
+    :type  providers: :class:`libcloud.compute.types.Provider`
 
     :return `list of dict objects`
     """
     result = []
-    for provider, Driver in get_providers_dict(providers.DRIVERS,
-                                               providers.Provider).items():
+    for provider, Driver in get_providers_dict().items():
         result.append({
             'id': provider,
             'friendly_name': getattr(Driver, 'name', ''),
@@ -138,32 +136,30 @@ def get_providers_info(providers):
     return result
 
 
-def get_providers_dict(drivers, providers):
+def get_providers_dict():
     result = {}
-    for provider_name in providers.__dict__.keys():
+    for provider_name in Provider.__dict__.keys():
         if provider_name.startswith('_'):
             continue
 
         provider_name = provider_name.upper()
         try:
-            Driver = get_driver_by_provider_name(drivers,
-                                                 providers,
-                                                 provider_name)
+            Driver = get_driver_by_provider_name(provider_name)
             result[provider_name] = Driver
         except ProviderNotSupportedError:
             continue
     return result
 
 
-def get_driver_by_provider_name(drivers, providers, provider_name):
+def get_driver_by_provider_name(provider_name):
     """
     Get a driver by provider name
     If the provider is unknown, will raise an exception.
 
     :param drivers: Dictionary containing valid providers.
 
-    :param providers: object that contain supported providers.
-    :type providers: :class:`libcloud.types.Provider`
+    :param provider: object that contain supported provider
+    :type providers: :class:`libcloud.compute.types.Provider`
 
     :param    provider_name:   String with a provider name (required)
     :type     provider_name:   ``str``
@@ -172,9 +168,18 @@ def get_driver_by_provider_name(drivers, providers, provider_name):
 
     """
     provider_name = provider_name.upper()
-    provider = getattr(providers, provider_name, None)
+
+    if ((provider_name == 'RACKSPACE_NOVA_DFW') or (provider_name == 'RACKSPACE_NOVA_BETA') or (provider_name == 'RACKSPACE_NOVA_ORD') or (provider_name == 'RACKSPACE_NOVA_LON')):
+        provider_name = 'RACKSPACE'
+    elif ((provider_name == 'RACKSPACE_UK')):
+        provider_name = 'RACKSPACE_FIRST_GEN'
+    else:
+        "Name conflict"
+
+    provider = getattr(Provider, provider_name, None)
+
     try:
-        Driver = get_driver(drivers, provider)
+        Driver = get_driver(provider)
     except AttributeError:
         raise ProviderNotSupportedError(provider=provider_name)
     return Driver
@@ -194,4 +199,8 @@ def get_driver_instance(Driver, **kwargs):
 if __name__ == '__main__':
     cls = get_driver(Provider.EC2_US_WEST)
     #print dir(cls)
-    DriverMethod(cls, 'create_node')
+    #DriverMethod(cls, 'create_node')
+    #print get_driver_by_provider_name(Provider,  'EC2_US_EAST')
+    #print get_providers_dict()
+    #print get_providers_info()
+    #print Provider.__dict__
