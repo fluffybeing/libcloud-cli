@@ -1,6 +1,5 @@
-""" This is code which will create dynamic classes"""
+"""This is code which will create dynamic classes"""
 #  I am using types for this and lamda function
-#
 
 import logging
 import six
