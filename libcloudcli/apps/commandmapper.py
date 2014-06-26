@@ -17,7 +17,6 @@ def mapper(resource, action):
     '''
     # generally names are joined with '_'
     if (resource in RESOURCE) and (action in ACTION):
-        print "hello"
         if resource.split(' '):
             new_name = resource.replace(' ', '_')
         method_name = action + '_' + new_name
