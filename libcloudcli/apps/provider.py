@@ -44,26 +44,30 @@ class DriverMethod(object):
         docstring_args = docstring_parse_result['arguments']
         docstring_return = docstring_parse_result['return']
 
+        #print self.description
+        #print type(docstring_args)
+        #print docstring_return
+
         #check vargs
         self.vargs_entries = []
-        for name, arg_info in docstring_args:
-            if name in docstring_args:
-                docstring_arg = docstring_args[name]
-                entry_kwargs = {
-                    'name': name,
-                    'description': docstring_arg['description'],
-                    'type_name': docstring_arg['type_name'],
-                    'required': (docstring_arg['required'] or
+        for name, arg_info in docstring_args.items():
+            docstring_arg_tmp = docstring_args[name]
+            #print docstring_arg_tmp
+            entry_kwargs = {
+                'name': name,
+                'description': docstring_arg_tmp['description'],
+                'type_name': docstring_arg_tmp['type_name'],
+                'required': (docstring_arg_tmp['required'] or
                                  arg_info['required']),
-                }
-                if not entry_kwargs['required'] and 'default' in arg_info:
-                    entry_kwargs['default'] = arg_info['default']
-                #self.vargs_entries.append(Entry(**entry_kwargs))
+            }
+            if not entry_kwargs['required'] and 'default' in arg_info:
+                entry_kwargs['default'] = arg_info['default']
+            #self.vargs_entries.append(Entry(**entry_kwargs))
             else:
                 raise MethodParsingException(
                     '%s %s not described in docstring' % (method_name, name))
-
-        print self.vargs_entries
+        '''
+        #print entry_kwargs
         #update kwargs
         kwargs = set(docstring_args).difference(argspec_arg)
 
