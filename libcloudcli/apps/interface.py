@@ -1,6 +1,6 @@
 # interface to link up the methods info and the dynamic class builder
 
-from provider import  DriverMethod, get_providers_info
+from provider import  DriverMethod, get_providers_info, get_driver_method
 
 
 

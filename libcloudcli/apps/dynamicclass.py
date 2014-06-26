@@ -2,65 +2,56 @@
 #  I am using types for this and lamda function
 #
 
+import logging
+import six
 
-#### Sample methods for the take actions
-def create():
-    print "create compute agent command"
+from cliff import command
+from cliff import lister
+from cliff import show
 
-def delete():
-    print "delete compute agent command"
+from provider import  DriverMethod, get_providers_info
 
-def List():
-    print "list compute agent command"
+from libcloud.compute.types import Provider
+from libcloud.compute.providers import get_driver
 
-def Set():
-    print "set compute agent command"
+class DynamicClass():
 
+    def __init__(self, **kwargs):
+        self.arguments = kwargs['arguments']
+        self.action = kwargs['action']
+        self.name = kwargs['name']
 
-def create_command(name, base=None, parser_value=None, action_value=None):
-    '''
-    :param    name: Name of the command class.
-    :type     name: ``str``
+    def take_action(self, parsed_args):
+        args = ()
+        for arg in self.arguments:
+                args += getattr(parsed_args.arg.keys())
+        result = self.action(args)
+        return result
 
-    :param    base: object that contain supported provider
-    :type     base: :class:`cliff.command.types`
+    def get_parser(self, prog_name):
+        parser = super(self.name, self).get_parser(prog_name)
+        for arg in self.arguments:
+            parser.add_argument(
+                arg.keys(),
+                metavar="<"+arg.keys()+">",
+                help=arg.values())
+        return parser
 
-    :param    parser_value: dict containing the options for the parser (required)
-    :type     parser_value:   ``dict``
+    def create_command(self, base=None):
+        fields = {}
 
-    :param    action_value: methods which will perfrom the action
+        fields['take_action'] = self.take_action()
+        fields['get_parser'] = self.get_parser()
 
-    :return: :class:`cliff.command.types`
-    '''
+        model = type(self.name, base, fields)
 
-    variables = {
-        'username': ("os", {'metavar':"<username>", 'help':"Type the username"}),
-        'password': ("password", {'metavar':"<password>", 'help':"Type of password"}),
-        'version': ("version", {'metavar':"<version>", 'help':"Version"}),
-        'url': ("url", {'metavar':"<url>", 'help':"URL"}),
-        'id': ("id", {'metavar':"<id>", 'help':"ID of the agent"}),
-    }
+        return model
 
-    actions = {"create": create, "delete": delete, "List": List}
-    fields = {}
-    get_parser_arguments = {}
-
-    for parser in parser_value:
-        get_parser_arguments['parser'] = variables[parser]
-
-    action = actions[action_value]
-    print action()
-    fields['take_action'] = lambda self: action()
-
-    fields['get_parser'] = lambda self: [variables[keys] for keys in parser_value]
-
-    model = type(name, base, fields)
-
-    return model
 
 if __name__ == '__main__':
-
-    model = create_command('CreateAgent', (object,), ['os', 'architecture'], 'create')
-    person_instance = model()
-    print person_instance.get_parser()
-    print person_instance.take_action()
+    cls = get_driver(Provider.EC2_US_WEST)
+    driver = DriverMethod(cls, 'create_node')
+    method_desc = driver.get_description()
+    print method_desc
+    D =  DynamicClass(method_desc)
+    print D.create_command()

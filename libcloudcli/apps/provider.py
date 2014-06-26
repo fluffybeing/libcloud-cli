@@ -93,12 +93,12 @@ class DriverMethod(object):
         result_arguments = []
 
         for entry in self.vargs_entries:
-            result_arguments.append(entry['name'])
+            result_arguments.append({entry['name']:entry['description']})
 
-        for entry in self.kwargs_entries:
-            result_arguments.append(entry['name'])
+        for entry in self.req_vargs_entries:
+            result_arguments.append({entry['name']:entry['description']})
 
-        result_arguments = list(set(result_arguments))
+        #result_arguments = list(set(result_arguments))
 
         result = {'name': self.method_name,
                   'description': self.description,
@@ -163,6 +163,17 @@ def get_providers_dict():
     return result
 
 
+def get_driver_methods(driver):
+    result = []
+    for method_name in dir(driver):
+        if method_name.startswith('_'):
+            continue
+        result.append(method_name)
+
+    #print dir(driver)
+    return result
+
+
 def get_driver_by_provider_name(provider_name):
     """
     Get a driver by provider name
@@ -209,11 +220,7 @@ def get_driver_instance(Driver, **kwargs):
 
 if __name__ == '__main__':
     cls = get_driver(Provider.EC2_US_WEST)
-    #print dir(cls)
-    b = DriverMethod(cls, 'create_node')
-    print b.get_description()
-    #get_driver_instance(cls)
-    #print get_driver_by_provider_name(Provider,  'EC2_US_EAST')
-    #print get_providers_dict()
-    #print get_providers_info()
-    #print Provider.__dict__
+    #b = DriverMethod(cls, 'create_node')
+    #print b.get_description()
+    print get_providers_methods(cls)
+
