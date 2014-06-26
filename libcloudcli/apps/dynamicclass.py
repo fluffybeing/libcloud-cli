@@ -33,32 +33,32 @@ def create_command(name, base=None, parser_value=None, action_value=None):
     :return: :class:`cliff.command.types`
     '''
 
-    actions = {"create": create, "delete": delete, "List": List}
-    fields = {}
-    get_parser_arguments = {}
-
-    for parser in get_parser:
-        get_parser_arguments['parser'] = variables[parser]
-
-    action = actions[action_value]
-    print action()
-    fields['take_action'] = lambda self: action()
-
-    fields['get_parser'] = lambda self: [variables[keys] for keys in get_parser]
-
-    model = type(name, base, fields)
-
-    return model
-
-if __name__ == '__main__':
-
     variables = {
         'username': ("os", {'metavar':"<username>", 'help':"Type the username"}),
         'password': ("password", {'metavar':"<password>", 'help':"Type of password"}),
         'version': ("version", {'metavar':"<version>", 'help':"Version"}),
         'url': ("url", {'metavar':"<url>", 'help':"URL"}),
         'id': ("id", {'metavar':"<id>", 'help':"ID of the agent"}),
-        }
+    }
+
+    actions = {"create": create, "delete": delete, "List": List}
+    fields = {}
+    get_parser_arguments = {}
+
+    for parser in parser_value:
+        get_parser_arguments['parser'] = variables[parser]
+
+    action = actions[action_value]
+    print action()
+    fields['take_action'] = lambda self: action()
+
+    fields['get_parser'] = lambda self: [variables[keys] for keys in parser_value]
+
+    model = type(name, base, fields)
+
+    return model
+
+if __name__ == '__main__':
 
     model = create_command('CreateAgent', (object,), ['os', 'architecture'], 'create')
     person_instance = model()
