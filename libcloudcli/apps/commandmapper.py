@@ -1,4 +1,4 @@
-# craete the resource, action to the methods name mapper
+# create the resource, action to the methods name mapper
 
 from libcloudcli.errors import *
 

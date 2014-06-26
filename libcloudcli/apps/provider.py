@@ -42,65 +42,71 @@ class DriverMethod(object):
         docstring_parse_result = parse_docstring(method_doc, self.driver_cls)
         self.description = docstring_parse_result['description']
         docstring_args = docstring_parse_result['arguments']
-        docstring_return = docstring_parse_result['return']
-
-        #print self.description
-        #print type(docstring_args)
-        #print docstring_return
 
         #check vargs
         self.vargs_entries = []
+        self.req_vargs_entries = []
         for name, arg_info in docstring_args.items():
             docstring_arg_tmp = docstring_args[name]
             #print docstring_arg_tmp
             entry_kwargs = {
                 'name': name,
-                'description': docstring_args_arg_tmp['description'],
+                'description': docstring_arg_tmp['description'],
                 'type_name': docstring_arg_tmp['type_name'],
                 'required': (docstring_arg_tmp['required'] or
-                                 arg_info['required']),
+                                arg_info['required']),
             }
-            if not entry_kwargs['required'] and 'default' in arg_info:
-                entry_kwargs['default'] = arg_info['default']
-            #self.vargs_entries.append(Entry(**entry_kwargs))
-            else:
-                raise MethodParsingException(
-                    '%s %s not described in docstring' % (method_name, name))
 
-        #print entry_kwargs
+            if not entry_kwargs['required']:
+                self.vargs_entries.append(entry_kwargs)
+            else:
+                self.req_vargs_entries.append(entry_kwargs)
+
         #update kwargs
         kwargs = set(docstring_args).difference(argspec_arg)
+        self.kwargs_entries = []
+        for entry in kwargs:
+            kwargs_entry = {
+                'name':entry,
+                'description':docstring_args[entry]['description'],
+                'type_name':docstring_args[entry]['type_name'],
+                'required':docstring_args[entry]['required']
+            }
+            self.kwargs_entries.append(kwargs_entry)
 
-        '''
-        self.kwargs_entries = [Entry(arg_name, **docstring_args[arg_name])
-                               for arg_name in kwargs]
         method_return = docstring_parse_result['return']
-        self.result_entry = Entry('', method_return['type_name'],
-                                  method_return['description'], True)
-
+        self.result_entry = method_return
         # For temporary purpose get method argument directly without validation
-        '''
 
     @classmethod
     def _remove_type_name_brackets(cls, type_name):
         return re.sub(cls._type_name_pattern, r'\1', type_name)
 
+    def get_arguments(self):
+        fields_args = [field.get_description_dict() for field in self._fields]
+        if not self.required:
+            for field_arg in fields_args:
+                field_arg['required'] = False
+        return fields_args
+
     def get_description(self):
         result_arguments = []
 
         for entry in self.vargs_entries:
-            result_arguments.extend(entry.get_arguments())
+            result_arguments.append(entry['name'])
 
         for entry in self.kwargs_entries:
-            result_arguments.extend(entry.get_arguments())
+            result_arguments.append(entry['name'])
+
+        result_arguments = list(set(result_arguments))
 
         result = {'name': self.method_name,
                   'description': self.description,
                   'arguments': result_arguments,
                   'return': {
                       'type': self._remove_type_name_brackets(
-                          self.result_entry.type_name),
-                      'description': self.result_entry.description}
+                          self.result_entry['type_name']),
+                      'description': self.result_entry['description']}
                   }
         return result
 
@@ -204,7 +210,9 @@ def get_driver_instance(Driver, **kwargs):
 if __name__ == '__main__':
     cls = get_driver(Provider.EC2_US_WEST)
     #print dir(cls)
-    DriverMethod(cls, 'create_node')
+    b = DriverMethod(cls, 'create_node')
+    print b.get_description()
+    #get_driver_instance(cls)
     #print get_driver_by_provider_name(Provider,  'EC2_US_EAST')
     #print get_providers_dict()
     #print get_providers_info()
