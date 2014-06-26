@@ -3,6 +3,7 @@
 #
 
 
+#### Sample methods for the take actions
 def create():
     print "create compute agent command"
 
@@ -15,17 +16,22 @@ def List():
 def Set():
     print "set compute agent command"
 
-def create_command(name, base=None, get_parser=None, action_value=None):
-    variables = {
-        'os': ("os", {'metavar':"<os>", 'help':"Type of OS"}),
-        'architecture': ("architecture", {'metavar':"<architecture>", 'help':"Type of architecture"}),
-        'version': ("version", {'metavar':"<version>", 'help':"Version"}),
-        'url': ("url", {'metavar':"<url>", 'help':"URL"}),
-        'md5hash': ("md5hash", {'metavar':"<md5hash>", 'help':"MD5 hash"}),
-        'hypervisor': ("hypervisor", {'metavar':"<hypervisor>", 'help':"Type of hypervisor", 'default':"xen"}),
-        '--hypervisor': ("--hypervisor", {'metavar':"<hypervisor>", 'help':"Type of hypervisor"}),
-        'id': ("id", {'metavar':"<id>", 'help':"ID of the agent"}),
-    }
+
+def create_command(name, base=None, parser_value=None, action_value=None):
+    '''
+    :param    name: Name of the command class.
+    :type     name: ``str``
+
+    :param    base: object that contain supported provider
+    :type     base: :class:`cliff.command.types`
+
+    :param    parser_value: dict containing the options for the parser (required)
+    :type     parser_value:   ``dict``
+
+    :param    action_value: methods which will perfrom the action
+
+    :return: :class:`cliff.command.types`
+    '''
 
     actions = {"create": create, "delete": delete, "List": List}
     fields = {}
@@ -45,6 +51,14 @@ def create_command(name, base=None, get_parser=None, action_value=None):
     return model
 
 if __name__ == '__main__':
+
+    variables = {
+        'username': ("os", {'metavar':"<username>", 'help':"Type the username"}),
+        'password': ("password", {'metavar':"<password>", 'help':"Type of password"}),
+        'version': ("version", {'metavar':"<version>", 'help':"Version"}),
+        'url': ("url", {'metavar':"<url>", 'help':"URL"}),
+        'id': ("id", {'metavar':"<id>", 'help':"ID of the agent"}),
+        }
 
     model = create_command('CreateAgent', (object,), ['os', 'architecture'], 'create')
     person_instance = model()

@@ -55,7 +55,7 @@ class DriverMethod(object):
             #print docstring_arg_tmp
             entry_kwargs = {
                 'name': name,
-                'description': docstring_arg_tmp['description'],
+                'description': docstring_args_arg_tmp['description'],
                 'type_name': docstring_arg_tmp['type_name'],
                 'required': (docstring_arg_tmp['required'] or
                                  arg_info['required']),
@@ -66,7 +66,7 @@ class DriverMethod(object):
             else:
                 raise MethodParsingException(
                     '%s %s not described in docstring' % (method_name, name))
-        '''
+
         #print entry_kwargs
         #update kwargs
         kwargs = set(docstring_args).difference(argspec_arg)
