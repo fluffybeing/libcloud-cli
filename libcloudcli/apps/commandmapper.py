@@ -1,10 +1,13 @@
 # craete the resource, action to the methods name mapper
 
+from libcloudcli.errors import *
 
-RESOURCE = ['node', 'image', 'size', 'volume', 'snapshot', 'key pair', ' public key from file', 'public key from string',
+RESOURCE = ['node', 'image', 'size', 'volume', 'snapshot', 'key pair',
+            ' public key from file', 'public key from string',
             'balancer', 'member', 'compute node']
 
-ACTION = ['create', 'reboot', 'destroy', 'deploy', 'sizes', 'detach', 'get', 'import', 'list']
+ACTION = ['create', 'reboot', 'destroy', 'deploy', 'sizes', 'detach',
+          'get', 'import', 'list']
 
 
 def mapper(resource, action):
@@ -18,7 +21,14 @@ def mapper(resource, action):
         if resource.split(' '):
             new_name = resource.replace(' ', '_')
         method_name = action + '_' + new_name
-    return method_name
+
+    if check_method(method_name):
+        return method_name
+
+
+def check_method(method_name):
+    ''' True if the method exits '''
+    return True
 
 if __name__ == '__main__':
     print mapper('node', 'create')

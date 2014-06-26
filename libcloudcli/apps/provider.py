@@ -8,15 +8,13 @@ import re
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 
-from parinx.parser import parse_args, \
+from parinx.parser import parse_args, ARGS_TO_XHEADERS_DICT, \
     parse_docstring, get_method_docstring
-from parinx.parser import _ParinxHandler
 
 from libcloudcli.errors import ProviderNotSupportedError,\
     MissingArguments, MissingHeadersError, MethodParsingException,\
     NoSuchOperationError
 
-from entries import Entry
 from parinx.utils import json
 
 
@@ -44,10 +42,11 @@ class DriverMethod(object):
         docstring_parse_result = parse_docstring(method_doc, self.driver_cls)
         self.description = docstring_parse_result['description']
         docstring_args = docstring_parse_result['arguments']
+        docstring_return = docstring_parse_result['return']
 
         #check vargs
         self.vargs_entries = []
-        for name, arg_info in argspec_arg.iteritems():
+        for name, arg_info in docstring_args:
             if name in docstring_args:
                 docstring_arg = docstring_args[name]
                 entry_kwargs = {
@@ -59,20 +58,23 @@ class DriverMethod(object):
                 }
                 if not entry_kwargs['required'] and 'default' in arg_info:
                     entry_kwargs['default'] = arg_info['default']
-                self.vargs_entries.append(Entry(**entry_kwargs))
+                #self.vargs_entries.append(Entry(**entry_kwargs))
             else:
                 raise MethodParsingException(
                     '%s %s not described in docstring' % (method_name, name))
 
+        print self.vargs_entries
         #update kwargs
         kwargs = set(docstring_args).difference(argspec_arg)
-        print kwargs
+
         '''
         self.kwargs_entries = [Entry(arg_name, **docstring_args[arg_name])
                                for arg_name in kwargs]
         method_return = docstring_parse_result['return']
         self.result_entry = Entry('', method_return['type_name'],
                                   method_return['description'], True)
+
+        # For temporary purpose get method argument directly without validation
         '''
 
     @classmethod
@@ -186,20 +188,19 @@ def get_driver_by_provider_name(provider_name):
 
 
 def get_driver_instance(Driver, **kwargs):
-    ph = _ParinxHandler()
     try:
         json_data = json.dumps(kwargs)
         driver_method = DriverMethod(Driver, '__init__')
         return driver_method.invoke(json_data)
     except MissingArguments, error:
-        str_repr = ', '.join([ph.ARGS_TO_XHEADERS_DICT.get(arg, arg)
+        str_repr = ', '.join([ARGS_TO_XHEADERS_DICT.get(arg, arg)
                               for arg in error.arguments])
         raise MissingHeadersError(headers=str_repr)
 
 if __name__ == '__main__':
     cls = get_driver(Provider.EC2_US_WEST)
     #print dir(cls)
-    #DriverMethod(cls, 'create_node')
+    DriverMethod(cls, 'create_node')
     #print get_driver_by_provider_name(Provider,  'EC2_US_EAST')
     #print get_providers_dict()
     #print get_providers_info()
