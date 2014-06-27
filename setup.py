@@ -52,9 +52,6 @@ setup(
             'libcloudcli = libcloudcli.main:main'
         ],
         'libcloud.cli.compute': [
-            'compute_node_create = libcloudcli.compute.node:CreateNode',
-            'compute_node_delete = libcloudcli.compute.node:DeleteNode',
-            'compute_node_set = libcloudcli.compute.node:SetNode'
         ],
     },
 
