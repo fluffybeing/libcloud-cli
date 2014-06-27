@@ -6,7 +6,10 @@ import logging
 import pkg_resources
 
 import cliff.commandmanager
-
+from dynamicclass import DynamicClass
+from provider import  DriverMethod, get_providers_info
+from collections import defaultdict
+from cliff.commandmanager import EntryPointWrapper
 
 LOG = logging.getLogger(__name__)
 
@@ -17,9 +20,12 @@ class CommandManager(cliff.commandmanager.CommandManager):
     """
     def __init__(self, namespace, convert_underscores=True):
         self.group_list = []
+        self.commands = defaultdict(dict)
+        self._load_commands()
         super(CommandManager, self).__init__(namespace, convert_underscores)
 
     def _load_commands(self, group=None):
+        '''
         if not group:
             group = self.namespace
         self.group_list.append(group)
@@ -31,6 +37,23 @@ class CommandManager(cliff.commandmanager.CommandManager):
                 else ep.name
             )
             self.commands[cmd_name] = ep
+        '''
+        cls = DynamicClass(method={})
+        command_class = cls.__class__.__name__
+        LOG.debug('Found command %s %s', name)
+
+        _command_construct = cls.get_command_construct()
+
+         command_name = '%s.%s.%s.%s.%s' % (
+                        self.namespace,
+                        'libcloudcli',
+                        _command_construct[0],
+                        _command_construct[1],
+                        _command_construct[2])
+
+        wrapper = EntryPointWrapper(name=command_name,
+                                    command_class=command_class)
+        self.commands[_command_construct[0]][_command_construct[1]][_command_construct[2]] = wrapper
         return
 
     def add_command_group(self, group=None):
@@ -41,3 +64,11 @@ class CommandManager(cliff.commandmanager.CommandManager):
     def get_command_groups(self):
         """Returns a list of the loaded command groups"""
         return self.group_list
+
+    def add_command(self, name, command_class):
+        if name == 'help':
+            # Overwrite HelpCommand with one which supports commands in the
+            # <command> <sub command> class
+            command_class = HelpCommand
+
+        self.commands[name]['index'] = EntryPointWrapper(name, command_class)

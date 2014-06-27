@@ -25,6 +25,13 @@ def mapper(resource, action):
         return method_name
 
 
+def get_resource_action(method):
+    result = method.split('_')
+    resource = result[1]
+    action = result[0]
+    return resource, action
+
+
 def check_method(method_name):
     ''' True if the method exits '''
     return True
