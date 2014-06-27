@@ -72,7 +72,10 @@ class LibcloudCLI(App):
                     default=False,
                     help="Show this help message and exit",
                 )
-
+        '''
+        This was the initial command which was made for
+        compute/node.py; now all the commands are dynamically getting genrated
+        so i think we don't need thsi
         commands = {
             'node create': CreateNode,
             'node set': SetNode,
@@ -81,6 +84,7 @@ class LibcloudCLI(App):
 
         for k, v in commands.iteritems():
             lib_command.add_command(k, v)
+        '''
 
     def authenticate_user(self):
         """Make sure the user has provided all of the authentication
@@ -142,6 +146,7 @@ class LibcloudCLI(App):
             self.dump_stack_trace = False
 
         # Commands that span multiple APIs
+        # this was to group command commands in one
         self.command_manager.add_command_group(
             'libcloud.common')
 
