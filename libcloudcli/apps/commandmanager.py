@@ -7,7 +7,7 @@ import pkg_resources
 
 import cliff.commandmanager
 from dynamicclass import DynamicClass
-from provider import  DriverMethod, get_providers_info
+from provider import DriverMethod, get_providers_info
 from collections import defaultdict
 from cliff.commandmanager import EntryPointWrapper
 
@@ -39,9 +39,15 @@ class CommandManager(cliff.commandmanager.CommandManager):
             self.commands[cmd_name] = ep
         '''
         cls = DynamicClass(method={})
-        command_class = cls.__class__.__name__
-        LOG.debug('Found command %s %s', name)
 
+        # name the class according to the command
+        command_class = cls.__dict__
+        command_class = command_class['name']
+
+        #LOG.debug('Found command %s %s', command_class)
+
+        # this will give the command construct we need
+        # i.e $ libcloud <api> <resource> <action>
         _command_construct = cls.get_command_construct()
 
          command_name = '%s.%s.%s.%s.%s' % (
@@ -53,6 +59,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
 
         wrapper = EntryPointWrapper(name=command_name,
                                     command_class=command_class)
+        # Add this command to command manager
         self.commands[_command_construct[0]][_command_construct[1]][_command_construct[2]] = wrapper
         return
 
