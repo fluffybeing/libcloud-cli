@@ -107,6 +107,10 @@ class DriverMethod(object):
                       'type': self._remove_type_name_brackets(
                           self.result_entry['type_name']),
                       'description': self.result_entry['description']}
+                   # this will be added dynamically for each commands
+                   'api': 'compute'
+                   'resource': ''
+                   'action': ''
                   }
         return result
 
