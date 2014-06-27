@@ -6,10 +6,9 @@ import logging
 import pkg_resources
 
 import cliff.commandmanager
-from dynamicclass import DynamicClass
-from provider import DriverMethod, get_providers_info
 from collections import defaultdict
 from cliff.commandmanager import EntryPointWrapper
+from interface import buildCommandClass
 
 LOG = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
             )
             self.commands[cmd_name] = ep
         '''
-        cls = DynamicClass(method={})
+        cls = buildCommandClass()
 
         # name the class according to the command
         command_class = cls.__dict__
