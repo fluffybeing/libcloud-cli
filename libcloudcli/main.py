@@ -10,18 +10,11 @@ from cliff import command
 from cliff import complete
 from cliff import help
 
-from compute.node import CreateNode, SetNode, DeleteNode
-
-from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
-
-#import libcloudcli
-#from libcloudcli.apps import commandmanager
 from apps import commandmanager
 from common import utils
 
 
-class LibcloudCLI(App):
+class Libcloudcli(App):
 
     CONSOLE_MESSAGE_FORMAT = '%(levelname)s: %(name)s %(message)s'
 
@@ -29,15 +22,15 @@ class LibcloudCLI(App):
 
     def __init__(self):
         # Patch command.Command to add a default auth_required = True
-        command.Command.auth_required = True
+        command.Command.auth_required = False
         command.Command.best_effort = False
         # but for help there should not be any authorisation
         help.HelpCommand.auth_required = False
         complete.CompleteCommand.best_effort = True
 
         lib_command = commandmanager.CommandManager('libcloud.cli')
-        super(LibcloudCLI, self).__init__(
-            description='Libcloud CLI App',
+        super(Libcloudcli, self).__init__(
+            description='Libcloud Command Line Interface Client',
             version='0.1',
             command_manager=lib_command)
         # Show stack traces
@@ -48,64 +41,13 @@ class LibcloudCLI(App):
         self.auth_client = None
 
         # Assume TLS host certificate verification is enabled
-        self.verify = True
+        self.verify = False
 
         # Replace the cliff-added help.HelpAction to defer its execution
-        self.DeferredHelpAction = None
-        for a in self.parser._actions:
-            if type(a) == help.HelpAction:
-                # Found it, save and replace it
-                self.DeferredHelpAction = a
-
-                # These steps are argparse-implementation-dependent
-                self.parser._actions.remove(a)
-                if self.parser._option_string_actions['-h']:
-                    del self.parser._option_string_actions['-h']
-                if self.parser._option_string_actions['--help']:
-                    del self.parser._option_string_actions['--help']
-
-                # Make a new help option to just set a flag
-                self.parser.add_argument(
-                    '-h', '--help',
-                    action='store_true',
-                    dest='deferred_help',
-                    default=False,
-                    help="Show this help message and exit",
-                )
-        '''
-        This was the initial command which was made for
-        compute/node.py; now all the commands are dynamically getting genrated
-        so i think we don't need thsi
-        commands = {
-            'node create': CreateNode,
-            'node set': SetNode,
-            'node destroy': DeleteNode,
-        }
-
-        for k, v in commands.iteritems():
-            lib_command.add_command(k, v)
-        '''
-
-    def authenticate_user(self):
-        """Make sure the user has provided all of the authentication
-        info we need.
-        """
-        self.log.debug('validating authentication options')
-        # use also the options parser for it
-        # get the provider
-        # authenticate with the provider with libcloud api
-        Driver = get_driver(Provider.RACKSPACE)
-        self.client_manager = Driver(
-            'ABCD', 'XYZ',
-            datacenter='us-central1-a',
-            project='your_project_id'
-            )
-
-        return
 
     def run(self, argv):
         try:
-            return super(LibcloudCLI, self).run(argv)
+            return super(Libcloudcli, self).run(argv)
         except Exception as e:
             if not logging.getLogger('').handlers:
                 logging.basicConfig()
@@ -116,25 +58,22 @@ class LibcloudCLI(App):
             return 1
 
     def build_option_parser(self, description, version):
-        parser = super(LibcloudCLI, self).build_option_parser(
+        parser = super(Libcloudcli, self).build_option_parser(
             description,
             version)
 
         parser.add_argument(
-            '--username',
-            metavar='<username>',
-            default=utils.env('USERNAME'),
-            help='Authentication username')
-        parser.add_argument(
-            '--password',
-            metavar='<password>',
-            default=utils.env('PASSWORD'),
-            help='Authentication password')
+            '-h', '--help',
+            action='HelpAction',
+            nargs=0,
+            default=self,
+            help='show this help message and exit'
+        )
         return parser
 
     def initialize_app(self, argv):
         self.log.debug('initialize_app')
-        super(LibcloudCLI, self).initialize_app(argv)
+        super(Libcloudcli, self).initialize_app(argv)
 
         # Set requests logging to a useful level
         requests_log = logging.getLogger("requests")
@@ -187,7 +126,7 @@ class LibcloudCLI(App):
 
 
 def main(argv=sys.argv[1:]):
-    app = LibcloudCLI()
+    app = Libcloudcli()
     return app.run(argv)
 
 
