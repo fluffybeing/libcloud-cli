@@ -20,6 +20,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
     def __init__(self, namespace, convert_underscores=True):
         self.group_list = []
         self.commands = defaultdict(dict)
+        self.namespace = namespace
         self._load_commands()
         super(CommandManager, self).__init__(namespace, convert_underscores)
 
@@ -48,13 +49,20 @@ class CommandManager(cliff.commandmanager.CommandManager):
         # this will give the command construct we need
         # i.e $ libcloud <api> <resource> <action>
         _command_construct = cls.get_command_construct()
+        api = _command_construct[0]
+        resource = _command_construct[1]
+        action = _command_construct[2]
 
-        command_name = '%s.%s.%s.%s.%s' % (self.namespace,'libcloudcli',_command_construct[0],_command_construct[1],_command_construct[2])
+        command_name = '%s.%s.%s.%s' % ('libcloudcli', api, resource, action)
 
         wrapper = EntryPointWrapper(name=command_name,
                                     command_class=command_class)
+
+        if not api in self.commands:
+            self.commands[api] = defaultdict(dict)
+
         # Add this command to command manager
-        self.commands[_command_construct[0]][_command_construct[1]][_command_construct[2]] = wrapper
+        self.commands[api][resource][action] = wrapper
         return
 
     def add_command_group(self, group=None):
@@ -65,11 +73,3 @@ class CommandManager(cliff.commandmanager.CommandManager):
     def get_command_groups(self):
         """Returns a list of the loaded command groups"""
         return self.group_list
-
-    def add_command(self, name, command_class):
-        if name == 'help':
-            # Overwrite HelpCommand with one which supports commands in the
-            # <command> <sub command> class
-            command_class = HelpCommand
-
-        self.commands[name]['index'] = EntryPointWrapper(name, command_class)
