@@ -19,8 +19,8 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
-DEFAULT_CREDENTIALS_FILE = '.libcloudcli'
-DEFAULT_ENV_PREFIX = 'LIBCLOUDCLI'
+DEFAULT_CREDENTIALS_FILE = '.libcloudcli/config.ini'
+DEFAULT_ENV_PREFIX = 'LIBCLOUD_CLI_'
 DEFAULT_CONFIG_PATH = pjoin(expanduser('~'), DEFAULT_CREDENTIALS_FILE)
 
 
@@ -37,7 +37,7 @@ def to_bolean(value, default_value=False):
     return not (value.lower() == 'false')
 
 
-def get_config(app, default_values=None, config_path=DEFAULT_CONFIG_PATH,
+def get_config(app=None, default_values=None, config_path=DEFAULT_CONFIG_PATH,
                env_prefix=DEFAULT_ENV_PREFIX, env_dict=None):
 
     result = {}
@@ -49,14 +49,12 @@ def get_config(app, default_values=None, config_path=DEFAULT_CONFIG_PATH,
         default_values = {}
 
     keys = [
-        ['default', 'username', 'username'],
-        ['default', 'api_key', 'api_key'],
-        ['default', 'verify_ssl', 'verify_ssl'],
-        ['default', 'auth_url', 'auth_url'],
-        ['default', 'region', 'region']
+        ['default', 'access_key_id', 'username'],
+        ['default', 'secret_access_key', 'password'],
+        ['default', 'provider', 'provider'],
     ]
 
-    env_keys = ['username', 'api_key', 'api_url', 'auth-url', 'verify_ssl', 'region']
+    env_keys = ['username', 'api_key', 'api_u', 'auth-url', 'verify_ssl', 'region']
 
     for key in env_keys:
         env_key = env_prefix + key
@@ -66,10 +64,7 @@ def get_config(app, default_values=None, config_path=DEFAULT_CONFIG_PATH,
             result[key] = env_dict[env_key]
 
     try:
-        root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        # currently config.ini is in example folder
-        config_path = os.path.join(root, 'examples/config.ini')
-        #config_path = env_dict.get(env_prefix + 'LIBCLI', config_path)
+        config_path = env_dict.get('config.ini', config_path)
         # TODO: There is a better way to log this message than print.
         print "Reading config info from %r" % config_path
 
@@ -111,3 +106,6 @@ def get_config(app, default_values=None, config_path=DEFAULT_CONFIG_PATH,
     except Exception as e:
         # TODO: There is a better way to log this message than print.
         print 'Failed to load config.ini.  Reason: %r' % str(e)
+
+if __name__ == '__main__':
+    print get_config()
