@@ -5,6 +5,7 @@ import os
 import sys
 import traceback
 
+from actions import HelpAction
 from cliff.app import App
 from cliff import command
 from cliff import complete
@@ -58,13 +59,15 @@ class Libcloudcli(App):
             return 1
 
     def build_option_parser(self, description, version):
+        argparse_kwargs = {'conflict_handler': 'resolve'}
         parser = super(Libcloudcli, self).build_option_parser(
             description,
-            version)
+            version,
+            argparse_kwargs=argparse_kwargs)
 
         parser.add_argument(
             '-h', '--help',
-            action='HelpAction',
+            action=HelpAction,
             nargs=0,
             default=self,
             help='show this help message and exit'
