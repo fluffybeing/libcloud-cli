@@ -29,7 +29,7 @@ class Libcloudcli(App):
         help.HelpCommand.auth_required = False
         complete.CompleteCommand.best_effort = True
 
-        lib_command = commandmanager.CommandManager('libcloud.cli')
+        lib_command = commandmanager.CommandManager('libcloudcli')
         super(Libcloudcli, self).__init__(
             description='Libcloud Command Line Interface Client',
             version='0.1',

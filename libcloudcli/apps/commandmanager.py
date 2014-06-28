@@ -2,6 +2,7 @@
 
 """Modify Cliff's CommandManager"""
 
+
 import logging
 import pkg_resources
 
@@ -9,6 +10,7 @@ import cliff.commandmanager
 from collections import defaultdict
 from cliff.commandmanager import EntryPointWrapper
 from interface import buildCommandClass
+from help import HelpCommand
 
 LOG = logging.getLogger(__name__)
 
@@ -25,6 +27,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
         super(CommandManager, self).__init__(namespace, convert_underscores)
 
     def _load_commands(self, group=None):
+        ## grouping of commands
         '''
         if not group:
             group = self.namespace
@@ -73,3 +76,84 @@ class CommandManager(cliff.commandmanager.CommandManager):
     def get_command_groups(self):
         """Returns a list of the loaded command groups"""
         return self.group_list
+
+    def add_command(self, name, command_class):
+        if name == 'help':
+            # Overwrite HelpCommand with one which supports commands in the
+            # <command> <sub command> class
+            command_class = HelpCommand
+        self.commands[name]['index'] = EntryPointWrapper(name, command_class)
+
+    def find_command(self, argv, called_by_help=False):
+        command = argv[0]
+        sub_command = None
+
+        if command == 'help':
+            command_entry = self.commands.get('help', {}).get('index', None)
+            cmd_factory = command_entry.load()
+            args = argv[1:]
+            return (cmd_factory, command, args)
+
+        if len(argv) >= 2:
+            app = argv[0]
+            sub_command = argv[1]
+        else:
+            app = None
+
+        if len(argv) > 2:
+            command = argv[2]
+            start_index = 3
+        else:
+            app = argv[0]
+            command = None
+
+        if not command:
+            if called_by_help:
+                cmd_string = ' '.join(argv).strip()
+                raise ValueError('Unknown command: %s' % (cmd_string))
+
+            command_entry = self.commands.get('help', {}).get('index', None)
+            cmd_factory = command_entry.load()
+
+            if app:
+                args = [app]
+            else:
+                args = []
+
+            if sub_command:
+                args += [sub_command]
+
+            if command:
+                args += [command]
+
+            command = ''
+            return (cmd_factory, command, args)
+
+        command_entry = self.commands.get(app, {}).get(sub_command, {}) \
+            .get(command, None)
+
+        if not command_entry:
+            if called_by_help:
+                cmd_string = ' '.join(argv).strip()
+                raise ValueError('Unknown command: %s' % (cmd_string))
+            else:
+                command_entry = self.commands.get('help', {}) \
+                                             .get('index', None)
+                cmd_factory = command_entry.load()
+
+                if app:
+                    args = [app]
+                else:
+                    args = []
+
+                if sub_command:
+                    args += [sub_command]
+
+                args += [command]
+
+                return (cmd_factory, command, args)
+
+        cmd_factory = command_entry.load()
+        args = argv[start_index:]
+        command_name = '%s %s' % (command, sub_command)
+        return (cmd_factory, command_name, args)
