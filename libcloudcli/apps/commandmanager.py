@@ -82,14 +82,14 @@ class CommandManager(cliff.commandmanager.CommandManager):
             # Overwrite HelpCommand with one which supports commands in the
             # <command> <sub command> class
             command_class = HelpCommand
-        self.commands[name]['index'] = EntryPointWrapper(name, command_class)
+        self.commands[name] = EntryPointWrapper(name, command_class)
 
     def find_command(self, argv, called_by_help=False):
         command = argv[0]
         sub_command = None
 
         if command == 'help':
-            command_entry = self.commands.get('help', {}).get('index', None)
+            command_entry = self.commands.get('help', {})
             cmd_factory = command_entry.load()
             args = argv[1:]
             return (cmd_factory, command, args)
@@ -97,6 +97,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
         if len(argv) >= 2:
             app = argv[0]
             sub_command = argv[1]
+            print argv
         else:
             app = None
 
@@ -112,7 +113,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
                 cmd_string = ' '.join(argv).strip()
                 raise ValueError('Unknown command: %s' % (cmd_string))
 
-            command_entry = self.commands.get('help', {}).get('index', None)
+            command_entry = self.commands.get('help', {})
             cmd_factory = command_entry.load()
 
             if app:
@@ -137,8 +138,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
                 cmd_string = ' '.join(argv).strip()
                 raise ValueError('Unknown command: %s' % (cmd_string))
             else:
-                command_entry = self.commands.get('help', {}) \
-                                             .get('index', None)
+                command_entry = self.commands.get('help', {})
                 cmd_factory = command_entry.load()
 
                 if app:
