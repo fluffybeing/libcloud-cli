@@ -10,8 +10,8 @@ from cliff import command
 from cliff import complete
 from cliff import help
 
+import libcloud
 from apps import commandmanager
-from common import utils
 
 
 class Libcloudcli(App):
@@ -75,15 +75,6 @@ class Libcloudcli(App):
         self.log.debug('initialize_app')
         super(Libcloudcli, self).initialize_app(argv)
 
-        # Set requests logging to a useful level
-        requests_log = logging.getLogger("requests")
-        if self.options.debug:
-            requests_log.setLevel(logging.DEBUG)
-            self.dump_stack_trace = True
-        else:
-            requests_log.setLevel(logging.WARNING)
-            self.dump_stack_trace = False
-
         # Commands that span multiple APIs
         # this was to group command commands in one
         self.command_manager.add_command_group(
@@ -101,23 +92,8 @@ class Libcloudcli(App):
         self.command_manager.add_command_group(
             'libcloud.loadbalancer')
 
-        # Handle deferred help and exit
-        if self.options.deferred_help:
-            self.DeferredHelpAction(self.parser, self.parser, None, None)
-
     def prepare_to_run_command(self, cmd):
         self.log.debug('prepare_to_run_command %s', cmd.__class__.__name__)
-
-        if not cmd.auth_required:
-            return
-        if cmd.best_effort:
-            try:
-                self.authenticate_user()
-            except Exception:
-                pass
-        else:
-            self.authenticate_user()
-        return
 
     def clean_up(self, cmd, result, err):
         self.log.debug('clean_up %s', cmd.__class__.__name__)
@@ -126,6 +102,15 @@ class Libcloudcli(App):
 
 
 def main(argv=sys.argv[1:]):
+    if '--debug' in argv:
+        # TODO: improve --debug support, done here very early so we can
+        # see everything possible.
+        file_path = '/dev/stderr'
+        file_handle = open(file_path, 'a')
+        libcloud.enable_debug(file_handle)
+        logging.basicConfig(filename=file_path,
+                            filemode='w',
+                            level=logging.DEBUG)
     app = Libcloudcli()
     return app.run(argv)
 
