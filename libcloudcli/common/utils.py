@@ -2,7 +2,6 @@
 #
 import os
 
-
 def env(*vars, **kwargs):
     """Search for the first defined of possibly many env vars
 
@@ -14,3 +13,4 @@ def env(*vars, **kwargs):
         if value:
             return value
     return kwargs.get('default', '')
+

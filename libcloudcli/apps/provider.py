@@ -104,7 +104,7 @@ class DriverMethod(object):
             result_arguments.append({entry['name']:entry['description']})
 
         #result_arguments = list(set(result_arguments))
-        tmp_result = get_api_resource_action()
+        tmp_result = self.get_api_resource_action()
         resource = tmp_result[1]
         action = tmp_result[0]
 
@@ -114,11 +114,11 @@ class DriverMethod(object):
                   'return': {
                       'type': self._remove_type_name_brackets(
                           self.result_entry['type_name']),
-                      'description': self.result_entry['description']}
+                      'description': self.result_entry['description']},
                    # this will be added dynamically for each commands
-                   'api': 'compute'
-                   'resource': resource
-                   'action': action
+                   'api': 'compute',
+                   'resource': resource,
+                   'action': action,
                   }
         return result
 

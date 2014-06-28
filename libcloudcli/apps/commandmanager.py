@@ -49,12 +49,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
         # i.e $ libcloud <api> <resource> <action>
         _command_construct = cls.get_command_construct()
 
-         command_name = '%s.%s.%s.%s.%s' % (
-                        self.namespace,
-                        'libcloudcli',
-                        _command_construct[0],
-                        _command_construct[1],
-                        _command_construct[2])
+        command_name = '%s.%s.%s.%s.%s' % (self.namespace,'libcloudcli',_command_construct[0],_command_construct[1],_command_construct[2])
 
         wrapper = EntryPointWrapper(name=command_name,
                                     command_class=command_class)

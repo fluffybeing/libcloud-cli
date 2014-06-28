@@ -1,8 +1,9 @@
 # interface to link up the methods info and the dynamic class builder
 
-from provider import  DriverMethod, get_providers_info, get_driver_method
+from provider import  DriverMethod, get_providers_info, get_driver_methods
 from dynamicclass import DynamicClass
-
+from libcloud.compute.types import Provider
+from libcloud.compute.providers import get_driver
 
 # get list of the supported provider
 def  providerList():
@@ -26,15 +27,15 @@ def get_provider_instance(name):
 
 # request dynamic builder to create the command class
 def buildCommandClass():
-    method_desc = methodInfo(driver, method)
+    cls = get_driver(Provider.EC2_US_WEST)
+    method_desc = methodInfo(cls, 'create_node')
     D = DynamicClass(method_desc)
-
     return D
 
 
 # get method info
 def methodInfo(driver, method):
-    D = DriverMethod(cls, Method)
+    D = DriverMethod(driver, method)
     result = D.get_description()
     return result
 
