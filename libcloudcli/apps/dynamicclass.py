@@ -14,25 +14,26 @@ from commandmapper import get_resource_action
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 
-class DynamicClass(object):
+class DynamicClass(command.Command):
 
-    def __init__(self, method_desc):
-        self.arguments = method_desc['arguments']
-        self.action = method_desc['action']
-        self.name = method_desc['name']
-        self.api = method_desc['api']
-        self.resource = method_desc['resource']
-        self.action = method_desc['action']
+    def __init__(self, app_args):
+        self.arguments = app_args['arguments']
+        self.action = app_args['action']
+        self.name = app_args['name']
+        self.api = app_args['api']
+        self.resource = app_args['resource']
+        self.action = app_args['action']
 
     def take_action(self, parsed_args):
         args = ()
         for arg in self.arguments:
                 args += getattr(parsed_args.arg.keys())
-        result = self.action(args)
+        #result = self.action(args)
+        result = "your node is created"
         return result
 
     def get_parser(self, prog_name):
-        parser = super(self.name, self).get_parser(prog_name)
+        parser = super(DynamicClass, self).get_parser(prog_name)
         for arg in self.arguments:
             parser.add_argument(
                 arg.keys(),
@@ -67,10 +68,10 @@ class DynamicClass(object):
 if __name__ == '__main__':
     cls = get_driver(Provider.EC2_US_WEST)
     driver = DriverMethod(cls, 'create_node')
-    method_desc = driver.get_description()
-    method_desc['api'] = 'compute'
+    app_args = driver.get_description()
+    app_args['api'] = 'compute'
     resource, action = get_resource_action('create_node')
-    method_desc['resource'] = resource
-    method_desc['action'] = action
-    D = DynamicClass(method_desc)
+    app_args['resource'] = resource
+    app_args['action'] = action
+    D = DynamicClass(app_args)
     print D.get_command_construct()

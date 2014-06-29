@@ -40,3 +40,9 @@ def methodInfo(driver, method):
     return result
 
 
+# new  name of the class
+def factory(BaseClass, name):
+    class NewClass(BaseClass): pass
+    NewClass.__name__ = "%s" % name
+    return NewClass
+

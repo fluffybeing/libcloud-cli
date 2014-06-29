@@ -9,7 +9,8 @@ import pkg_resources
 import cliff.commandmanager
 from collections import defaultdict
 from cliff.commandmanager import EntryPointWrapper
-from interface import buildCommandClass
+from interface import buildCommandClass, factory
+from dynamicclass import DynamicClass
 from help import HelpCommand
 
 LOG = logging.getLogger(__name__)
@@ -44,9 +45,8 @@ class CommandManager(cliff.commandmanager.CommandManager):
         cls = buildCommandClass()
 
         # name the class according to the command
-        command_class = cls.__dict__
-        command_class = command_class['name']
-
+        class_attr = cls.__dict__
+        command_class = factory(cls, class_attr['name'])
         #LOG.debug('Found command %s %s', command_class)
 
         # this will give the command construct we need
@@ -97,7 +97,6 @@ class CommandManager(cliff.commandmanager.CommandManager):
         if len(argv) >= 2:
             app = argv[0]
             sub_command = argv[1]
-            print argv
         else:
             app = None
 
@@ -155,5 +154,6 @@ class CommandManager(cliff.commandmanager.CommandManager):
 
         cmd_factory = command_entry.load()
         args = argv[start_index:]
+        print args
         command_name = '%s %s' % (command, sub_command)
         return (cmd_factory, command_name, args)
