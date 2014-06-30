@@ -45,8 +45,7 @@ class CommandManager(cliff.commandmanager.CommandManager):
         cls = buildCommandClass()
 
         # name the class according to the command
-        class_attr = cls.__dict__
-        command_class = factory(cls, class_attr['name'])
+        command_class = cls
         #LOG.debug('Found command %s %s', command_class)
 
         # this will give the command construct we need
