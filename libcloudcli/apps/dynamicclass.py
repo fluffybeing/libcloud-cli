@@ -28,7 +28,6 @@ class DynamicClass(command.Command):
         args = ()
         for arg in self.arguments:
                 args += getattr(parsed_args.arg.keys())
-        #result = self.action(args)
         result = "your node is created"
         return result
 

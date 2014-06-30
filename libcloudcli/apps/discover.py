@@ -19,7 +19,6 @@ class Discover(ShowOne):
             metavar="<providers>",
             help="returns lists of supported provider")
 
-
         #just for the sake of now only one arguments
         parser.add_argument(
             "provider",
