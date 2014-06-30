@@ -4,10 +4,10 @@ import os
 from cliff.command import Command
 from cliff.show import ShowOne
 from cliff.lister import Lister
-from interface import  providerList
+from interface import providersList
 
 
-class Discover(Command):
+class Discover(ShowOne):
     "A simple command that prints a message."
 
     log = logging.getLogger(__name__)
@@ -18,6 +18,9 @@ class Discover(Command):
             "providers",
             metavar="<providers>",
             help="returns lists of supported provider")
+
+        '''
+        #just for the sake of now only one arguments
         parser.add_argument(
             "provider",
             metavar="<provider>",
@@ -26,12 +29,13 @@ class Discover(Command):
             "methods",
             metavar="<methods>",
             help="retuns supported methods")
-
+        #print "hello"
+        '''
         return parser
 
     def take_action(self, parsed_args):
         if parsed_args.providers:
-            return providerList()
+            return providersList()
         else:
             print "adding more subcommands"
 

@@ -93,6 +93,12 @@ class CommandManager(cliff.commandmanager.CommandManager):
             args = argv[1:]
             return (cmd_factory, command, args)
 
+        if command == "discover":
+            command_entry = self.commands.get('discover', {})
+            cmd_factory = command_entry.load()
+            args = argv[1:]
+            return (cmd_factory, command, args)
+
         if len(argv) >= 2:
             app = argv[0]
             sub_command = argv[1]

@@ -5,6 +5,7 @@ from dynamicclass import DynamicClass
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 
+
 # get list of the supported provider
 def  providersList():
     result = get_providers_info()
@@ -30,8 +31,8 @@ def buildCommandClass():
     cls = get_driver(Provider.EC2_US_WEST)
     method_desc = methodInfo(cls, 'create_node')
     cls = DynamicClass(method_desc)
-    result = factory(cls, method_desc['name'])
-    return result
+    #result = factory(cls, method_desc['name'])
+    return cls
 
 
 # get method info

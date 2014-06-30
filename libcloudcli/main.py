@@ -12,7 +12,7 @@ from cliff import complete
 from cliff import help
 
 import libcloud
-from apps import commandmanager
+from apps import commandmanager, discover
 
 
 class Libcloudcli(App):
@@ -44,7 +44,15 @@ class Libcloudcli(App):
         # Assume TLS host certificate verification is enabled
         self.verify = False
 
-        # Replace the cliff-added help.HelpAction to defer its execution
+        # To do Replace the cliff-added help.HelpAction to defer its execution
+
+        commands = {
+            'discover': discover.Discover,
+        }
+
+        for k, v in commands.iteritems():
+            #command.add_command(k, v)
+            lib_command.add_command(k, v)
 
     def run(self, argv):
         try:
