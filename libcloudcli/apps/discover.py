@@ -30,6 +30,8 @@ class Discover(Command):
         return parser
 
     def take_action(self, parsed_args):
-        self.log.info('sending greeting')
-        self.log.debug('debugging')
-        self.app.stdout.write('AWS FILED \n')
+        if parsed_args.providers:
+            return providerList()
+        else:
+            print "adding more subcommands"
+
