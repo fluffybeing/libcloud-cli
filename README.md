@@ -9,7 +9,8 @@ task, So a CLI for Libcloud will bring up lot of new possibilities to its users 
 administrators to perform commonly used operations (listing servers, rebooting servers etc.) easily via
 command line without writing a single line of code.
 
-Command line client is available on PyPi and can be installed using pip:
+## Installation
+Command line client is not currently available on PyPi and so it can be installed using setup.py:
 
 ```bash
 pip install -r requirements.txt
@@ -54,7 +55,7 @@ To specify a custom formatter, use `-f` option. For example:
 
 ## Development
 
-### Testing and Lint
+### Testing Lint
 
 Running lint
 
