@@ -28,7 +28,7 @@ setting the `LibcloudCLI_` environment variable
 Example configuration files can be found in the `examples/` directory.
 
 ## Usage
-
+Note: currently only compute commands works. I am trying to add more and more commands to it.
 ```bash
 libcloudcli <api> <resource> <action> [options]
 ```
